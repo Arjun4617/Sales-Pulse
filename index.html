@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#f0f0ed" />
+  <meta name="apple-mobile-web-app-title" content="AGC Sales Pulse" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>AGC Sales Pulse</title>
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f0f0ed;
+      --bg2:       #ffffff;
+      --bg3:       #e8e8e4;
+      --bg4:       #ddddd8;
+      --border:    rgba(0,0,0,0.07);
+      --border2:   rgba(0,0,0,0.13);
+      --text:      #111110;
+      --text2:     #555550;
+      --text3:     #999990;
+      --accent:    #1a1a18;
+      --green:     #1a7f4b;
+      --green-bg:  #e8f5ee;
+      --amber:     #92600a;
+      --amber-bg:  #fef3e2;
+      --red:       #c0202a;
+      --red-bg:    #fdecea;
+      --blue:      #1e40af;
+      --blue-bg:   #eff6ff;
+      --pill-r:    100px;
+      --card-r:    20px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Geist', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(240,240,237,0.92);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      padding: env(safe-area-inset-top,0) 0 0;
+    }
+
+    .header-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 28px 12px; gap: 12px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; }
+
+    .brand-logo {
+      width: 36px; height: 36px; border-radius: 12px;
+      background: linear-gradient(135deg, #1a1a18 0%, #3a3a36 100%);
+      box-shadow: 0 2px 8px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.08);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; overflow: hidden; padding: 6px;
+    }
+
+    .brand-name  { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
+    .brand-label { font-size: 10px; color: var(--text3); margin-top: 1px; letter-spacing: .2px; }
+
+    .header-right { display: flex; align-items: center; gap: 10px; }
+
+    .active-month-badge {
+      display: flex; align-items: center;
+      background: #1a73e8;
+      border: 1px solid #1a73e8;
+      border-radius: var(--pill-r);
+      padding: 5px 12px;
+      font-size: 11px; font-weight: 500; color: #fff;
+      box-shadow: 0 2px 8px rgba(26,115,232,.3);
+    }
+    .active-month-badge:empty { display: none; }
+
+    .live-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--pill-r);
+      padding: 5px 12px 5px 10px;
+      font-size: 11px; font-weight: 500; color: var(--text2);
+    }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse-green 2s ease infinite;
+    }
+    @keyframes pulse-green {
+      0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(26,127,75,.4); }
+      50%      { opacity: .8; box-shadow: 0 0 0 4px rgba(26,127,75,0); }
+    }
+
+    .last-updated-badge {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--pill-r);
+      padding: 5px 12px;
+      font-size: 11px; color: var(--text3);
+    }
+    .last-updated-label { font-weight: 500; }
+    .last-updated-time  { font-family: 'Geist Mono', monospace; font-weight: 500; color: var(--text2); }
+
+    .refresh-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--bg2); border: 1px solid var(--border2);
+      color: var(--text2); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .18s; flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .refresh-btn:hover { background: var(--bg3); color: var(--text); }
+    .refresh-btn:active { transform: scale(.92); }
+    .refresh-btn svg { width: 14px; height: 14px; }
+    .refresh-btn.spinning svg { animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── MONTH BAR ── */
+    .month-bar-wrap {
+      position: relative;
+    }
+    .month-bar-wrap::after {
+      content: '';
+      position: absolute; top: 0; right: 0;
+      width: 48px; height: 100%;
+      background: linear-gradient(to right, transparent, rgba(240,240,237,0.92));
+      pointer-events: none;
+    }
+    .month-bar {
+      display: flex; gap: 6px;
+      overflow-x: auto; scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 0 4px;
+    }
+    .month-bar::-webkit-scrollbar { display: none; }
+
+    .month-pill {
+      flex-shrink: 0;
+      padding: 7px 18px; border-radius: var(--pill-r);
+      font-size: 12px; font-weight: 500;
+      background: var(--bg2); color: var(--text2);
+      border: 1px solid var(--border);
+      cursor: pointer; transition: all .18s;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Geist', sans-serif;
+    }
+    .month-pill:hover:not(.active) { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+    .month-pill.active {
+      background: #1a73e8; color: #fff;
+      border-color: #1a73e8;
+      box-shadow: 0 2px 8px rgba(26,115,232,.35), 0 1px 2px rgba(26,115,232,.2);
+    }
+
+    /* ── MAIN ── */
+    .main {
+      max-width: 1040px; margin: 0 auto;
+      padding: 28px 24px 80px;
+    }
+
+    /* ── SUMMARY BAR ── */
+    .summary-bar {
+      display: flex; flex-wrap: wrap;
+      gap: 8px;
+      padding: 0;
+      margin-bottom: 20px;
+      animation: fadeUp .4s ease both;
+    }
+    .summary-item {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--pill-r);
+      padding: 6px 14px 6px 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+      flex-shrink: 0;
+    }
+    .summary-item-dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .summary-item-dot.sales   { background: var(--green); }
+    .summary-item-dot.distrib { background: var(--blue); }
+    .summary-item-dot.collect { background: var(--amber); }
+    .summary-item-label {
+      font-size: 11px; color: var(--text3); font-weight: 500;
+      white-space: nowrap;
+    }
+    .summary-item-sep {
+      font-size: 11px; color: var(--border2); margin: 0 1px;
+    }
+    .summary-item-value {
+      font-size: 12px; font-weight: 700;
+      font-family: 'Geist Mono', monospace;
+      letter-spacing: -.3px; white-space: nowrap;
+    }
+    .summary-item-value.sales   { color: var(--green); }
+    .summary-item-value.distrib { color: var(--blue); }
+    .summary-item-value.collect { color: var(--amber); }
+
+    @media (max-width: 700px) {
+      .summary-bar { gap: 6px; }
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-label {
+      font-size: 13px; font-weight: 600; color: var(--text2);
+      letter-spacing: -.1px;
+    }
+
+    /* role legend */
+    .role-legend {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .role-legend-item {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; color: var(--text3);
+    }
+    .role-dot {
+      width: 8px; height: 8px; border-radius: 3px; flex-shrink: 0;
+    }
+    .role-dot.coord  { background: var(--blue); }
+    .role-dot.coll   { background: var(--green); }
+    .role-dot.exec   { background: var(--text3); }
+
+    .member-count {
+      font-size: 11px; color: var(--text3);
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--pill-r); padding: 4px 12px;
+      font-family: 'Geist Mono', monospace;
+    }
+
+    /* ── TEAM GRID ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 14px;
+    }
+
+    /* ── PERSON CARD ── */
+    .person-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--card-r);
+      overflow: hidden;
+      transition: box-shadow .2s, transform .2s;
+      animation: fadeUp .5s ease both;
+      position: relative;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.06);
+    }
+    .person-card:hover {
+      box-shadow: 0 4px 8px rgba(0,0,0,.06), 0 16px 40px rgba(0,0,0,.1);
+      transform: translateY(-3px);
+    }
+
+    /* Top-3 rank accent — subtle gradient + glow */
+    .person-card.rank-1 {
+      background: linear-gradient(145deg, #fffef0 0%, #fff 100%);
+      box-shadow: 0 0 0 1.5px rgba(234,179,8,.15), 0 8px 24px rgba(0,0,0,.07);
+    }
+    .person-card.rank-2 {
+      background: linear-gradient(145deg, #f8f9fb 0%, #fff 100%);
+      box-shadow: 0 0 0 1.5px rgba(148,163,184,.2), 0 8px 24px rgba(0,0,0,.06);
+    }
+    .person-card.rank-3 {
+      background: linear-gradient(145deg, #fff8f2 0%, #fff 100%);
+      box-shadow: 0 0 0 1.5px rgba(194,120,80,.15), 0 8px 24px rgba(0,0,0,.06);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── CARD HEAD ── */
+    .card-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rank-medal {
+      position: absolute; top: 12px; right: 14px;
+      font-size: 16px; line-height: 1;
+    }
+
+    .rank-badge {
+      position: absolute; top: 14px; right: 14px;
+      font-size: 10px; font-weight: 600; color: var(--text3);
+      font-family: 'Geist Mono', monospace;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--pill-r); padding: 2px 8px;
+    }
+
+    .avatar {
+      width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: var(--text2);
+      background: var(--bg3);
+      letter-spacing: -.3px;
+      box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.6);
+    }
+    .avatar.coord { background: var(--blue-bg); color: var(--blue); }
+    .avatar.coll  { background: var(--green-bg); color: var(--green); }
+
+    .card-info { flex: 1; min-width: 0; }
+    .card-name {
+      font-size: 15px; font-weight: 700; letter-spacing: -.4px; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      padding-right: 36px;
+    }
+    .card-role  { font-size: 12px; color: var(--text3); margin-top: 2px; }
+    .card-region {
+      display: inline-block; font-size: 10px; color: var(--text3);
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--pill-r); padding: 2px 8px; margin-top: 5px;
+      letter-spacing: .3px; text-transform: uppercase; font-weight: 500;
+    }
+
+    /* ── OVERALL SCORE — inline, not a ring ── */
+    .overall-score {
+      flex-shrink: 0; text-align: right;
+      margin-left: auto;
+      padding-right: 36px;
+    }
+    .score-num {
+      font-size: 28px; font-weight: 800;
+      font-family: 'Geist Mono', monospace;
+      letter-spacing: -2px; line-height: 1;
+    }
+    .score-num .score-unit { font-size: 13px; font-weight: 600; }
+    .score-num.great { color: var(--green); }
+    .score-num.good  { color: var(--amber); }
+    .score-num.poor  { color: var(--red); }
+    .score-num.na    { color: var(--text3); font-size: 18px; }
+    .score-lbl {
+      font-size: 11px; color: var(--text3); margin-top: 3px;
+      letter-spacing: .3px; text-transform: uppercase; font-weight: 500;
+    }
+
+    /* ── METRICS ── */
+    .metrics { padding: 4px 0; }
+    .metric-row {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .metric-row:last-child { border-bottom: none; }
+
+    /* Inverse metric warning stripe */
+    .metric-row.inverse-breach {
+      background: var(--red-bg);
+    }
+
+    .metric-top {
+      display: flex; justify-content: space-between;
+      align-items: center; gap: 8px; margin-bottom: 8px;
+    }
+    .metric-name-wrap { display: flex; align-items: center; flex: 1; min-width: 0; gap: 6px; }
+    .metric-name {
+      font-size: 12px; font-weight: 500; color: var(--text3);
+      white-space: normal; overflow: visible; word-break: break-word;
+    }
+    .metric-weight {
+      font-size: 10px; color: var(--text3);
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--pill-r); padding: 1px 7px; flex-shrink: 0;
+      font-family: 'Geist Mono', monospace;
+    }
+    .metric-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .metric-numbers {
+      font-size: 12px; color: var(--text3);
+      font-family: 'Geist Mono', monospace;
+    }
+    .metric-numbers strong { color: var(--text2); font-weight: 600; }
+
+    .metric-pct-badge {
+      font-size: 11px; font-weight: 700;
+      padding: 3px 10px; border-radius: var(--pill-r);
+      font-family: 'Geist Mono', monospace;
+    }
+    .metric-pct-badge.great { background: var(--green-bg); color: var(--green); }
+    .metric-pct-badge.good  { background: var(--amber-bg); color: var(--amber); }
+    .metric-pct-badge.poor  { background: var(--red-bg);   color: var(--red); }
+    .metric-pct-badge.na    { background: var(--bg3); color: var(--text3); }
+
+    /* Inverse breach badge */
+    .breach-badge {
+      font-size: 10px; font-weight: 700;
+      padding: 3px 10px; border-radius: var(--pill-r);
+      background: var(--red); color: #fff;
+      font-family: 'Geist', sans-serif;
+      letter-spacing: .2px;
+    }
+
+    .prog-track {
+      height: 4px; border-radius: 99px;
+      background: var(--bg3); overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%; border-radius: 99px;
+      transition: width 1s cubic-bezier(.23,1,.32,1);
+    }
+    .prog-fill.great { background: linear-gradient(90deg, #1a7f4b, #34d079); }
+    .prog-fill.good  { background: linear-gradient(90deg, #b45309, #f59e0b); }
+    .prog-fill.poor  { background: var(--red); }
+    .prog-fill.na    { background: var(--bg4); }
+
+    /* Inverse breach — full red bar */
+    .prog-fill.breach { background: var(--red); }
+
+    /* ── STATES ── */
+    .state-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 400px; gap: 18px; text-align: center; padding: 60px 20px;
+    }
+    .spinner {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 3px solid var(--bg3);
+      border-top-color: var(--accent);
+      animation: spin .7s linear infinite;
+    }
+    .state-icon  { font-size: 48px; line-height: 1; }
+    .state-title { font-size: 20px; font-weight: 700; letter-spacing: -.4px; }
+    .state-subtitle { font-size: 13px; color: var(--text3); max-width: 280px; line-height: 1.6; }
+    .state-msg   { font-size: 13px; color: var(--text3); max-width: 300px; line-height: 1.6; white-space: pre-line; }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 36px; padding: 16px 0;
+      border-top: 1px solid var(--border);
+      font-size: 11px; color: var(--text3);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-family: 'Geist Mono', monospace;
+    }
+    .footer-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); flex-shrink: 0;
+      animation: pulse-green 2s ease infinite;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .header-top { padding: 12px 16px 10px; }
+      .month-bar  { padding: 0 16px 12px; }
+      .main       { padding: 16px 12px 80px; }
+      .summary-bar { grid-template-columns: 1fr; gap: 8px; }
+      .team-grid  { grid-template-columns: 1fr; }
+      .role-legend { display: none; }
+      .summary-value { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 453 92" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+          <path d="M189.625 46.5643C189.625 43.9719 190.459 41.7501 192.128 39.8979C193.797 38.0797 195.837 37.171 198.248 37.171H267.042C270.04 37.171 272.852 37.7768 275.479 39.0222C278.106 40.2686 280.423 41.9513 282.401 44.1063C284.38 46.2614 285.894 48.787 286.975 51.749C288.057 54.6782 288.583 57.7757 288.583 61.0416V65.3517C288.583 68.6176 288.057 71.7151 286.975 74.6442C285.894 77.5734 284.38 80.1319 282.401 82.2869C280.423 84.4419 278.106 86.1247 275.479 87.3711C272.852 88.6165 270.04 89.2222 267.042 89.2222H173.462C168.548 89.2222 164.19 87.9091 160.358 85.3167C156.526 82.6904 153.281 79.3578 150.561 75.25C147.873 71.1422 145.802 66.5303 144.35 61.4461C142.897 56.3619 142.186 51.4123 142.186 46.5643C142.186 41.7162 142.928 36.632 144.442 31.5817C145.957 26.5653 148.12 21.9863 150.994 17.8785C153.868 13.7717 157.33 10.4042 161.409 7.81177C165.488 5.21937 170.093 3.90625 175.254 3.90625H279.96C282.339 3.90625 284.38 4.81586 286.079 6.63315C287.748 8.45141 288.583 10.6742 288.583 13.2995C288.583 15.9257 287.748 18.1146 286.079 19.9667C284.41 21.784 282.37 22.6936 279.96 22.6936H179.18C174.976 22.6936 171.607 23.5017 169.042 25.1515C166.478 26.7676 164.437 28.7871 162.923 31.1105C161.409 33.4677 160.42 36.0263 159.864 38.8209C159.338 41.6156 159.06 44.208 159.06 46.5643C159.06 48.9215 159.338 51.48 159.864 54.3085C160.389 57.1022 161.409 59.6956 162.923 62.0519C164.406 64.4091 166.447 66.3948 169.042 68.0108C171.607 69.6278 175.007 70.4687 179.18 70.4687H266.3C267.721 70.4687 269.019 69.7623 270.163 68.3147C271.306 66.8661 271.862 65.1833 271.862 63.2305C271.862 61.2777 271.338 59.5601 270.349 58.1463C269.328 56.6987 267.969 55.9913 266.3 55.9913H198.216C195.806 55.9913 193.797 55.0827 192.097 53.2644C190.428 51.4462 189.594 49.2244 189.594 46.5981" fill="#ff4d5a"/>
+          <path d="M306.572 46.5642C306.572 41.6156 307.314 36.632 308.828 31.5817C310.312 26.5653 312.506 21.9863 315.38 17.8785C318.254 13.7717 321.716 10.4042 325.796 7.81177C329.874 5.21937 334.479 3.90625 339.641 3.90625H444.377C446.757 3.90625 448.797 4.81586 450.496 6.63315C452.165 8.45141 453 10.6742 453 13.2995C453 15.9257 452.165 18.1146 450.496 19.9667C448.827 21.784 446.788 22.6936 444.377 22.6936H343.441C339.239 22.6936 335.87 23.5017 333.275 25.1515C330.709 26.7676 328.669 28.7871 327.155 31.1105C325.641 33.4677 324.652 36.0263 324.096 38.8209C323.57 41.6155 323.292 44.208 323.292 46.5642C323.292 48.9215 323.57 51.48 324.096 54.3085C324.652 57.1022 325.641 59.6956 327.155 62.0519C328.669 64.4091 330.678 66.3948 333.275 68.0108C335.839 69.6278 339.239 70.4687 343.441 70.4687H444.377C446.757 70.4687 448.797 71.3783 450.496 73.1966C452.165 75.0139 453 77.2366 453 79.8629C453 82.4892 452.165 84.6771 450.496 86.5292C448.827 88.3475 446.788 89.2561 444.377 89.2561H337.848C332.934 89.2561 328.577 87.943 324.745 85.3506C320.912 82.7243 317.636 79.3916 314.948 75.2839C312.259 71.1761 310.188 66.5632 308.766 61.48C307.314 56.3958 306.603 51.4462 306.603 46.5981" fill="#ff4d5a"/>
+          <path d="M128.009 76.2257C127.545 75.1148 126.927 74.1045 126.217 73.1959L82.5789 9.59546C80.5395 6.59954 77.9121 4.24228 74.6674 2.5595C71.4226 0.875742 68.0224 0 64.4374 0C60.6056 0 57.0206 0.942508 53.6515 2.82851C50.3144 4.71354 47.5946 7.17144 45.5854 10.1683L1.94775 74.1722C0.742405 75.6199 0.155273 77.5049 0.155273 79.8283C0.155273 82.4546 0.990226 84.6425 2.65924 86.4946C4.32736 88.3129 6.36765 89.2215 8.77834 89.2215C11.4049 89.2215 13.6299 88.0439 15.4224 85.6866L30.4115 64.0039H98.5256L113.298 85.5182C114.967 88.01 117.254 89.2215 120.129 89.2215C122.539 89.2215 124.548 88.3129 126.248 86.4946C127.917 84.6764 128.751 82.4546 128.751 79.8283C128.751 78.5152 128.504 77.3365 128.04 76.1918M43.2058 45.4865L57.6077 24.6457C58.3183 23.6016 59.3079 22.4568 60.5745 21.2114C61.842 19.966 63.1086 19.3593 64.4374 19.3593C65.7663 19.3593 67.0338 19.966 68.3004 21.2114C69.5679 22.4568 70.6187 23.6016 71.4528 24.6457L85.7926 45.4865H43.2058Z" fill="#ff4d5a"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Sales Pulse</div>
+        <div class="brand-label">Sales Intelligence</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        <span>Live</span>
+      </div>
+      <div class="last-updated-badge" id="lastUpdatedBadge" style="display:none;">
+        <span class="last-updated-label">Updated</span>
+        <span class="last-updated-time" id="lastUpdatedTime"></span>
+      </div>
+      <button class="refresh-btn" id="refreshBtn" onclick="fetchData()" aria-label="Refresh">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+</header>
+
+<main class="main">
+
+  <div class="month-bar-wrap" style="margin-bottom:20px;">
+    <div class="month-bar" id="monthBar"></div>
+  </div>
+
+  <div class="state-wrap" id="stateLoading">
+    <div class="spinner"></div>
+    <div class="state-title">Loading data</div>
+    <div class="state-subtitle">Fetching performance data from Google Sheets…</div>
+  </div>
+
+  <div class="state-wrap" id="stateError" style="display:none;">
+    <div class="state-icon">⚠️</div>
+    <div class="state-title" style="color:var(--red)">Could not load data</div>
+    <div class="state-msg" id="errMsg"></div>
+  </div>
+
+  <div id="dashboard" style="display:none;">
+
+    <!-- ── SUMMARY BAR ── -->
+    <div class="summary-bar">
+      <div class="summary-item">
+        <div class="summary-item-dot sales"></div>
+        <span class="summary-item-label">Company Sales</span>
+        <span class="summary-item-sep">&middot;</span>
+        <span class="summary-item-value sales" id="sumCompanySales">—</span>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-dot distrib"></div>
+        <span class="summary-item-label">Van + Other</span>
+        <span class="summary-item-sep">&middot;</span>
+        <span class="summary-item-value distrib" id="sumDistribSales">—</span>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-dot collect"></div>
+        <span class="summary-item-label">Total Collection</span>
+        <span class="summary-item-sep">&middot;</span>
+        <span class="summary-item-value collect" id="sumCollection">—</span>
+      </div>
+    </div>
+
+    <!-- ── SECTION ── -->
+    <div class="section-top">
+      <div class="section-label" id="sectionLabel"></div>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="role-legend">
+          <div class="role-legend-item"><div class="role-dot coord"></div>Coordinator</div>
+          <div class="role-legend-item"><div class="role-dot coll"></div>Collection</div>
+          <div class="role-legend-item"><div class="role-dot exec"></div>Executive</div>
+        </div>
+        <div class="member-count" id="memberCount"></div>
+      </div>
+    </div>
+
+    <div class="team-grid" id="teamGrid"></div>
+
+    <div class="state-wrap" id="stateEmpty" style="display:none;">
+      <div class="state-icon">📋</div>
+      <div class="state-title">No data yet</div>
+      <div class="state-subtitle">Fill in Achieved, Targets &amp; Weightage columns in the Google Sheet for this month, then refresh.</div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-dot"></div>
+      <span id="footer"></span>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  ⚠️  PASTE YOUR GAS WEB APP URL HERE after deploying
+// ════════════════════════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwAe7iELza1O9C2GtUju5QTRahZPekzUAFFNO5A7bIIRMpHPaVtoNr_XVgjGWNoiF5ZCw/exec';
+
+// ── Inverse metrics: metric name fragments that are "lower is better"
+// Return rate > 5% of target = zero points, full red bar
+const INVERSE_METRICS   = ['return rate', 'return'];
+const RETURN_RATE_LIMIT = 5; // percent — above this = breach
+
+let allData   = {};
+let allMonths = [];
+
+document.addEventListener('DOMContentLoaded', fetchData);
+
+function fetchData() {
+  showState('loading');
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+
+  const cbName = 'kpi_' + Date.now();
+  const tag    = document.createElement('script');
+
+  window[cbName] = function(res) {
+    delete window[cbName]; tag.remove();
+    btn.classList.remove('spinning');
+    if (!res.success) { showState('error', res.error || 'Server error.'); return; }
+
+    allData   = res.data   || {};
+    allMonths = res.months || [];
+    if (!allMonths.length) { showState('error', 'Sheet is empty — add data first.'); return; }
+
+    buildMonthPills();
+    selectMonth(allMonths[allMonths.length - 1]);
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('stateLoading').style.display = 'none';
+
+    // Update last-updated badge near Live button
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+    const timeStr = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+    const badge = document.getElementById('lastUpdatedBadge');
+    document.getElementById('lastUpdatedTime').textContent = dateStr + ', ' + timeStr;
+    badge.style.display = 'flex';
+
+    document.getElementById('footer').textContent =
+      'Last synced · ' + timeStr;
+  };
+
+  tag.onerror = () => {
+    delete window[cbName]; tag.remove();
+    btn.classList.remove('spinning');
+    showState('error', 'Cannot reach server.\n\n1. Make sure GAS_URL is set correctly in index.html.\n2. Redeploy with "Who has access: Anyone".');
+  };
+
+  tag.src = GAS_URL + '?callback=' + cbName + '&t=' + Date.now();
+  document.head.appendChild(tag);
+}
+
+function buildMonthPills() {
+  const bar = document.getElementById('monthBar');
+  bar.innerHTML = '';
+  allMonths.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className   = 'month-pill';
+    btn.textContent = cap(m);
+    btn.dataset.m   = m;
+    btn.onclick     = () => selectMonth(m);
+    bar.appendChild(btn);
+  });
+}
+
+function selectMonth(m) {
+  document.querySelectorAll('.month-pill').forEach(b =>
+    b.classList.toggle('active', b.dataset.m === m));
+  const badge = document.getElementById('activeMonthBadge');
+  if (badge) badge.textContent = m.charAt(0).toUpperCase() + m.slice(1);
+  renderMonth(m);
+}
+
+// ── Compute summary totals from raw people data ──
+function computeSummary(people) {
+  let companySales  = 0;
+  let vanOther      = 0;
+  let collection    = 0;
+
+  Object.values(people).forEach(person => {
+    const role = (person.role || '').toLowerCase();
+    const isCoord   = role.includes('coordinator');
+    const isCollect = role.includes('collection');
+
+    (person.metrics || []).forEach(m => {
+      const nm  = (m.metric || '').toLowerCase();
+      const val = m.achieved || 0;
+
+      // Company sales — all non-collection members with a "sales" metric (excl. van/other)
+      if (!isCollect && nm.includes('sales') && !nm.includes('van') && !nm.includes('other')) {
+        companySales += val;
+      }
+
+      // Van + Other — from coordinators only
+      if (isCoord && (nm.includes('van') || nm.includes('other'))) {
+        vanOther += val;
+      }
+
+      // Total Collection — from coordinators' collection metric only
+      if (isCoord && nm.includes('collection')) {
+        collection += val;
+      }
+    });
+  });
+
+  return { companySales, vanOther, collection };
+}
+
+function renderMonth(month) {
+  const grid   = document.getElementById('teamGrid');
+  const empty  = document.getElementById('stateEmpty');
+  const label  = document.getElementById('sectionLabel');
+  const mcount = document.getElementById('memberCount');
+
+  label.textContent = cap(month) + ' · Team Performance';
+  grid.innerHTML    = '';
+
+  const people = allData[month];
+  if (!people || !Object.keys(people).length) {
+    empty.style.display = 'flex';
+    clearSummary();
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Summary band
+  const s = computeSummary(people);
+  document.getElementById('sumCompanySales').textContent  = fmt(s.companySales);
+  document.getElementById('sumDistribSales').textContent  = fmt(s.vanOther);
+  document.getElementById('sumCollection').textContent    = fmt(s.collection);
+
+  // Sort by score, render cards
+  const sorted = Object.entries(people)
+    .sort(([,a],[,b]) => (b.overallScore ?? -1) - (a.overallScore ?? -1));
+
+  mcount.textContent = sorted.length + ' members';
+
+  sorted.forEach(([name, p], i) => {
+    grid.appendChild(makeCard(name, p, i, i + 1));
+  });
+}
+
+function clearSummary() {
+  ['sumCompanySales','sumDistribSales','sumCollection'].forEach(id => {
+    document.getElementById(id).textContent = '—';
+  });
+}
+
+function makeCard(name, person, idx, rank) {
+  const el = document.createElement('div');
+  el.className = 'person-card';
+  if (rank <= 3) el.classList.add('rank-' + rank);
+  el.style.animationDelay = (idx * .06) + 's';
+
+  const roleLow = (person.role || '').toLowerCase();
+  const avClass = roleLow.includes('coordinator') ? 'coord'
+                : roleLow.includes('collection')  ? 'coll' : '';
+
+  const sc      = person.overallScore;
+  const scClass = grade(sc);
+
+  // Rank indicator: medal for top 3, badge number for rest
+  const rankHtml = rank <= 3
+    ? `<div class="rank-medal">${['🥇','🥈','🥉'][rank-1]}</div>`
+    : `<div class="rank-badge">#${rank}</div>`;
+
+  // Overall score — large inline number
+  const scoreHtml = sc !== null && sc !== undefined
+    ? `<div class="score-num ${scClass}">${sc}<span class="score-unit">%</span></div>
+       <div class="score-lbl">Overall</div>`
+    : ``;
+
+  const metricsHtml = (person.metrics || []).map(m => {
+    const isInverse = INVERSE_METRICS.some(kw => (m.metric || '').toLowerCase().includes(kw));
+    const ach = m.achieved !== null && m.achieved !== undefined ? fmt(m.achieved) : '—';
+    const tgt = m.target   !== null && m.target   !== undefined ? fmt(m.target)   : '—';
+    const wgt = m.weightage !== null && m.weightage !== undefined
+      ? `<span class="metric-weight">${m.weightage}%</span>` : '';
+
+    if (isInverse) {
+      // Return rate: check if achieved > (target * RETURN_RATE_LIMIT / 100)
+      // pct here = (achieved / target * 100) for return rate
+      // Breach = achieved rate > limit threshold
+      const rawPct = m.pct;
+      const isBreach = rawPct !== null && rawPct !== undefined && rawPct > RETURN_RATE_LIMIT;
+
+      const badgeHtml = isBreach
+        ? `<span class="breach-badge">LIMIT EXCEEDED</span>`
+        : `<span class="metric-pct-badge great">${rawPct !== null ? rawPct + '%' : '—'}</span>`;
+
+      const barClass  = isBreach ? 'breach' : 'great';
+      // For inverse, bar shows how much of limit is used (capped at 100% at limit)
+      const fillPct   = rawPct !== null
+        ? Math.min((rawPct / RETURN_RATE_LIMIT) * 100, 100)
+        : 0;
+      const rowClass  = isBreach ? 'metric-row inverse-breach' : 'metric-row';
+
+      return `
+        <div class="${rowClass}">
+          <div class="metric-top">
+            <div class="metric-name-wrap">
+              <span class="metric-name">${m.metric}</span>${wgt}
+            </div>
+            <div class="metric-right">
+              <span class="metric-numbers"><strong>${ach}</strong> / ${tgt}</span>
+              ${badgeHtml}
+            </div>
+          </div>
+          <div class="prog-track">
+            <div class="prog-fill ${barClass}" style="width:0%" data-width="${fillPct.toFixed(1)}%"></div>
+          </div>
+        </div>`;
+    }
+
+    // Normal metric
+    const g    = grade(m.pct);
+    const pct  = m.pct !== null ? m.pct + '%' : '—';
+    const fill = m.pct !== null ? Math.min(m.pct, 100) + '%' : '0%';
+
+    return `
+      <div class="metric-row">
+        <div class="metric-top">
+          <div class="metric-name-wrap">
+            <span class="metric-name">${m.metric}</span>${wgt}
+          </div>
+          <div class="metric-right">
+            <span class="metric-numbers"><strong>${ach}</strong> / ${tgt}</span>
+            <span class="metric-pct-badge ${g}">${pct}</span>
+          </div>
+        </div>
+        <div class="prog-track">
+          <div class="prog-fill ${g}" style="width:0%" data-width="${fill}"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="card-head">
+      <div class="avatar ${avClass}">${initials(name)}</div>
+      <div class="card-info">
+        <div class="card-name">${name}</div>
+        <div class="card-role">${person.role || ''}</div>
+        ${person.region ? `<div class="card-region">${person.region}</div>` : ''}
+      </div>
+      <div class="overall-score">
+        ${scoreHtml}
+      </div>
+      ${rankHtml}
+    </div>
+    <div class="metrics">${metricsHtml}</div>`;
+
+  requestAnimationFrame(() => {
+    el.querySelectorAll('.prog-fill[data-width]').forEach(bar => {
+      setTimeout(() => { bar.style.width = bar.dataset.width; }, 100 + idx * 55);
+    });
+  });
+
+  return el;
+}
+
+// Normal grade: higher = better
+function grade(pct) {
+  if (pct === null || pct === undefined) return 'na';
+  if (pct >= 80) return 'great';
+  if (pct >= 50) return 'good';
+  return 'poor';
+}
+
+function initials(name) {
+  return name.trim().split(/\s+/).map(w => w[0] || '').join('').toUpperCase().slice(0,2);
+}
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function fmt(n) {
+  if (n === null || n === undefined) return '—';
+  if (n >= 10000000) return (n/10000000).toFixed(2) + 'Cr';
+  if (n >= 100000)   return (n/100000).toFixed(2) + 'L';
+  if (n >= 1000)     return (n/1000).toFixed(1) + 'K';
+  return n.toLocaleString('en-IN');
+}
+function showState(type, msg) {
+  document.getElementById('stateLoading').style.display = type === 'loading' ? 'flex' : 'none';
+  document.getElementById('stateError').style.display   = type === 'error'   ? 'flex' : 'none';
+  if (type !== 'loading') document.getElementById('dashboard').style.display = 'none';
+  if (msg) document.getElementById('errMsg').textContent = msg;
+}
+</script>
+</body>
+</html>
