@@ -539,20 +539,26 @@
 
     /* ── FOOTER ── */
     .footer {
-      margin-top: 40px; padding: 18px 0;
+      margin-top: 24px; padding: 18px 0;
       border-top: 1px solid var(--border);
       font-family: 'Raleway', sans-serif;
       font-size: 9px; font-weight: 700;
       color: var(--text3); letter-spacing: 2px; text-transform: uppercase;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; flex-wrap: wrap;
     }
+    .footer .last-updated-badge {
+      border: none; background: none;
+      padding: 0; font-size: 9px; letter-spacing: 2px;
+      color: var(--text3); gap: 6px;
+    }
+    .footer .last-updated-time { color: var(--text3); font-size: 9px; }
+
     .footer-dot {
       width: 6px; height: 6px; border-radius: 50%;
       background: var(--green); flex-shrink: 0;
       animation: pulse-green 2s ease infinite;
     }
-
-    /* ── RESPONSIVE ── */
     @media (max-width: 700px) {
       .header-top { padding: 10px 16px 8px; }
       .month-bar-wrap { padding: 0 16px; }
@@ -585,10 +591,7 @@
         <div class="live-dot"></div>
         <span>Live</span>
       </div>
-      <div class="last-updated-badge" id="lastUpdatedBadge" style="display:none;">
-        <span class="last-updated-label">Updated</span>
-        <span class="last-updated-time" id="lastUpdatedTime"></span>
-      </div>
+
       <button class="refresh-btn" id="refreshBtn" onclick="fetchData()" aria-label="Refresh">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <polyline points="23 4 23 10 17 10"/>
@@ -620,7 +623,27 @@
 
   <div id="dashboard" style="display:none;">
 
-    <!-- ── SUMMARY BAR ── -->
+    <div class="team-grid" id="teamGrid"></div>
+
+    <div class="state-wrap" id="stateEmpty" style="display:none;">
+      <div class="state-icon">📋</div>
+      <div class="state-title">No data yet</div>
+      <div class="state-subtitle">Fill in Achieved, Targets &amp; Weightage columns in the Google Sheet for this month, then refresh.</div>
+    </div>
+
+    <!-- ── SECTION + SUMMARY ── -->
+    <div class="section-top" style="margin-top:24px;margin-bottom:12px;border-bottom:none;border-top:1px solid var(--border);padding-top:14px;padding-bottom:0;">
+      <div class="section-label" id="sectionLabel"></div>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="role-legend">
+          <div class="role-legend-item"><div class="role-dot coord"></div>Coordinator</div>
+          <div class="role-legend-item"><div class="role-dot coll"></div>Collection</div>
+          <div class="role-legend-item"><div class="role-dot exec"></div>Executive</div>
+        </div>
+        <div class="member-count" id="memberCount"></div>
+      </div>
+    </div>
+
     <div class="summary-bar">
       <div class="summary-item">
         <div class="summary-item-dot sales"></div>
@@ -642,30 +665,13 @@
       </div>
     </div>
 
-    <div class="team-grid" id="teamGrid"></div>
-
-    <div class="state-wrap" id="stateEmpty" style="display:none;">
-      <div class="state-icon">📋</div>
-      <div class="state-title">No data yet</div>
-      <div class="state-subtitle">Fill in Achieved, Targets &amp; Weightage columns in the Google Sheet for this month, then refresh.</div>
-    </div>
-
-    <!-- ── SECTION ── -->
-    <div class="section-top" style="margin-top:24px;margin-bottom:0;border-bottom:none;border-top:1px solid var(--border);padding-top:14px;padding-bottom:0;">
-      <div class="section-label" id="sectionLabel"></div>
-      <div style="display:flex;align-items:center;gap:14px;">
-        <div class="role-legend">
-          <div class="role-legend-item"><div class="role-dot coord"></div>Coordinator</div>
-          <div class="role-legend-item"><div class="role-dot coll"></div>Collection</div>
-          <div class="role-legend-item"><div class="role-dot exec"></div>Executive</div>
-        </div>
-        <div class="member-count" id="memberCount"></div>
-      </div>
-    </div>
-
     <div class="footer">
       <div class="footer-dot"></div>
       <span id="footer"></span>
+      <div class="last-updated-badge" id="lastUpdatedBadge" style="display:none;">
+        <span class="last-updated-label">Updated</span>
+        <span class="last-updated-time" id="lastUpdatedTime"></span>
+      </div>
     </div>
   </div>
 
