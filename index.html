@@ -421,11 +421,12 @@
       padding-right: 40px;
     }
     .score-num {
-      font-family: 'Raleway', sans-serif;
-      font-size: 30px; font-weight: 900;
-      letter-spacing: -1px; line-height: 1;
+      font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif;
+      font-size: 30px; font-weight: 800;
+      letter-spacing: -1.5px; line-height: 1;
     }
     .score-num .score-unit {
+      font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif;
       font-size: 14px; font-weight: 700; letter-spacing: 0;
     }
     .score-num.great { color: var(--green); }
@@ -471,17 +472,17 @@
     }
     .metric-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .metric-numbers {
-      font-family: 'Lato', sans-serif;
+      font-family: -apple-system, 'SF Pro Text', BlinkMacSystemFont, sans-serif;
       font-size: 11px; color: var(--text3);
       letter-spacing: .3px;
     }
     .metric-numbers strong { color: var(--text2); font-weight: 700; }
 
     .metric-pct-badge {
-      font-family: 'Raleway', sans-serif;
-      font-size: 9px; font-weight: 800;
+      font-family: -apple-system, 'SF Pro Text', BlinkMacSystemFont, sans-serif;
+      font-size: 10px; font-weight: 700;
       padding: 3px 10px; border-radius: 2px;
-      letter-spacing: 1.5px; text-transform: uppercase;
+      letter-spacing: 0; text-transform: uppercase;
     }
     .metric-pct-badge.great { background: var(--green-bg); color: var(--green); }
     .metric-pct-badge.good  { background: var(--gold-bg);  color: var(--gold); }
@@ -833,6 +834,25 @@ function clearSummary() {
   });
 }
 
+// ── Compute overall score from available (non-null) metrics ──
+function computeScore(person) {
+  // If the sheet already gave us a score, use it
+  if (person.overallScore !== null && person.overallScore !== undefined) {
+    return person.overallScore;
+  }
+  // Otherwise calculate from metrics that have both pct and weightage
+  const metrics = (person.metrics || []).filter(m => {
+    const isInverse = INVERSE_METRICS.some(kw => (m.metric || '').toLowerCase().includes(kw));
+    return !isInverse && m.pct !== null && m.pct !== undefined
+        && m.weightage !== null && m.weightage !== undefined;
+  });
+  if (!metrics.length) return null;
+  const totalWeight = metrics.reduce((s, m) => s + m.weightage, 0);
+  if (!totalWeight) return null;
+  const weighted = metrics.reduce((s, m) => s + (Math.min(m.pct, 100) * m.weightage), 0);
+  return Math.round(weighted / totalWeight);
+}
+
 function makeCard(name, person, idx, rank) {
   const el = document.createElement('div');
   el.className = 'person-card';
@@ -843,7 +863,7 @@ function makeCard(name, person, idx, rank) {
   const avClass = roleLow.includes('coordinator') ? 'coord'
                 : roleLow.includes('collection')  ? 'coll' : '';
 
-  const sc      = person.overallScore;
+  const sc      = computeScore(person);
   const scClass = grade(sc);
 
   // Rank indicator: medal for top 3, badge number for rest
